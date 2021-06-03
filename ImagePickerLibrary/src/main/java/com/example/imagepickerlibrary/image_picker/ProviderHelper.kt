@@ -3,14 +3,19 @@ package com.example.imagepickerlibrary.image_picker
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.imagepickerlibrary.image_picker.model.Picker
+import com.example.imagepickerlibrary.image_picker.ui.ProPickerActivity
+import com.example.imagepickerlibrary.util.D
 import com.example.imagepickerlibrary.util.FileUriUtils
 import com.example.imagepickerlibrary.util.FileUtil
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ProviderHelper(private val activity: AppCompatActivity) {
 
@@ -32,22 +37,22 @@ class ProviderHelper(private val activity: AppCompatActivity) {
     init {
         val bundle = activity.intent.extras!!
 
-        isMultiSelection = bundle.getBoolean(ProPicker.EXTRA_MULTI_SELECTION, false)
+        isMultiSelection = bundle.getBoolean(ImagePicker.EXTRA_MULTI_SELECTION, false)
 
         // Cropping
-        isCropEnabled = bundle.getBoolean(ProPicker.EXTRA_CROP, false)
-        isCropOvalEnabled = bundle.getBoolean(ProPicker.EXTRA_CROP_OVAL, false)
-        isToCompress = bundle.getBoolean(ProPicker.EXTRA_IS_TO_COMPRESS, false)
+        isCropEnabled = bundle.getBoolean(ImagePicker.EXTRA_CROP, false)
+        isCropOvalEnabled = bundle.getBoolean(ImagePicker.EXTRA_CROP_OVAL, false)
+        isToCompress = bundle.getBoolean(ImagePicker.EXTRA_IS_TO_COMPRESS, false)
 
         // Get Max Width/Height parameter from Intent
-        mMaxWidth = bundle.getInt(ProPicker.EXTRA_MAX_WIDTH, 0)
-        mMaxHeight = bundle.getInt(ProPicker.EXTRA_MAX_HEIGHT, 0)
+        mMaxWidth = bundle.getInt(ImagePicker.EXTRA_MAX_WIDTH, 0)
+        mMaxHeight = bundle.getInt(ImagePicker.EXTRA_MAX_HEIGHT, 0)
 
         // Get Crop Aspect Ratio parameter from Intent
-        mCropAspectX = bundle.getFloat(ProPicker.EXTRA_CROP_X, 0f)
-        mCropAspectY = bundle.getFloat(ProPicker.EXTRA_CROP_Y, 0f)
+        mCropAspectX = bundle.getFloat(ImagePicker.EXTRA_CROP_X, 0f)
+        mCropAspectY = bundle.getFloat(ImagePicker.EXTRA_CROP_Y, 0f)
 
-        mGalleryMimeTypes = bundle.getStringArray(ProPicker.EXTRA_MIME_TYPES) as Array<String>
+        mGalleryMimeTypes = bundle.getStringArray(ImagePicker.EXTRA_MIME_TYPES) as Array<String>
 
 
     }
@@ -60,32 +65,36 @@ class ProviderHelper(private val activity: AppCompatActivity) {
 
     fun setResultAndFinish(images: ArrayList<Picker>?) {
         val i = Intent().apply {
-            putParcelableArrayListExtra(ProPicker.EXTRA_SELECTED_IMAGES, images)
+            putParcelableArrayListExtra(ImagePicker.EXTRA_SELECTED_IMAGES, images)
         }
+        Log.d("CurrentDateTag Finish", Date().toString())
         activity.setResult(Activity.RESULT_OK, i)
         activity.finish()
     }
 
     private suspend fun prepareImage(uri: Uri) = withContext(Dispatchers.IO) {
+        Log.d("CurrentDateTag", Date().toString())
         return@withContext if (isToCompress) {
 
             val file = FileUtil.compressImage(
-                activity.baseContext,
-                uri,
-                mMaxWidth.toFloat(),
-                mMaxHeight.toFloat()
+                    activity.baseContext,
+                    uri,
+                    mMaxWidth.toFloat(),
+                    mMaxHeight.toFloat()
             )
 
             val name = file.name
+            Log.d("CurrentDateTag", Date().toString())
             Picker(name, Uri.fromFile(file), file)
         } else {
             val file = File(FileUriUtils.getRealPath(activity.baseContext, uri) ?: "")
             val name = file.name
+            Log.d("CurrentDateTag", Date().toString())
             Picker(name, uri, file)
         }
     }
 
-    suspend fun performGalleryOperationForSingleSelection(uri: Uri)/*: ArrayList<Picker> */{
+    suspend fun performGalleryOperationForSingleSelection(uri: Uri)/*: ArrayList<Picker> */ {
 //        val image = prepareImage(uri)
 //        val images = ArrayList<Picker>()
 //        images.add(image)
@@ -142,7 +151,9 @@ class ProviderHelper(private val activity: AppCompatActivity) {
 
     private fun startCrop(sourceUri: Uri, croppedUri: Uri) {
         val uCrop = UCrop.of(sourceUri, croppedUri)
-
+        val activity = activity as ProPickerActivity
+        val d = D.showProgressDialog(activity, "Processing")
+        d.show()
         val options = UCrop.Options()
 //        options.setCompressionFormat(FileUtil.getCompressFormat(extension))
         options.setCircleDimmedLayer(isCropOvalEnabled)
@@ -164,10 +175,10 @@ class ProviderHelper(private val activity: AppCompatActivity) {
     }
 
     suspend fun handleUCropResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-        captureImageUri: Uri?
+            requestCode: Int,
+            resultCode: Int,
+            data: Intent?,
+            captureImageUri: Uri?
     ) {
 
         if (resultCode == Activity.RESULT_OK && requestCode == UCrop.REQUEST_CROP && data != null) {
@@ -177,10 +188,11 @@ class ProviderHelper(private val activity: AppCompatActivity) {
             }
             // Getting the cropped image
             val resultUri = UCrop.getOutput(data)
-
+            Log.d("CurrentDateTag Before", Date().toString())
             val image = prepareImage(resultUri!!)
             val images = ArrayList<Picker>()
             images.add(image)
+            Log.d("CurrentDateTag After", Date().toString())
             setResultAndFinish(images)
 
         } else if (resultCode == UCrop.RESULT_ERROR) {

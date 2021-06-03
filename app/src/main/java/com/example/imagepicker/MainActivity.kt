@@ -5,19 +5,18 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.example.imagepickerlibrary.image_picker.ProPicker
+import com.example.imagepickerlibrary.image_picker.ImagePicker
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         findViewById<TextView>(R.id.btnChooser).setOnClickListener {
-            ProPicker.with(this)
+            ImagePicker.with(this)
                     .start { resultCode, data ->
                         if (resultCode == RESULT_OK && data != null) {
-                            val l = ProPicker.getPickerData(data)
+                            val l = ImagePicker.getPickerData(data)
 
                             findViewById<ImageView>(R.id.iv).setImageURI(l?.uri)
                         }
@@ -25,13 +24,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.btnGallery).setOnClickListener {
-            ProPicker.with(this)
+            ImagePicker.with(this)
                     .galleryOnly()
                     .cropOval()
                     .compressImage()
                     .start { resultCode, data ->
                         if (resultCode == RESULT_OK && data != null) {
-                            val list = ProPicker.getSelectedPickerDatas(data)
+                            val list = ImagePicker.getSelectedPickerDatas(data)
                             if (list.size > 0) {
                                 Glide.with(this)
                                         .load(list[0].file)
@@ -43,15 +42,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.btnShowCameraOnlyWithCrop).setOnClickListener {
-            ProPicker.with(this)
+            ImagePicker.with(this)
                     .cameraOnly()
 //                    .crop()
-                    .maxResultSize(200, 200)
-                    .compressImage(1024,1024)
+//                    .maxResultSize(200, 200)
+//                    .compressImage(1024,1024)
                     .cropOval()
                     .start { resultCode, data ->
                         if (resultCode == RESULT_OK && data != null) {
-                            val picker = ProPicker.getPickerData(data)
+                            val picker = ImagePicker.getPickerData(data)
 
                             findViewById<ImageView>(R.id.iv).setImageURI(picker?.uri)
 
@@ -59,13 +58,13 @@ class MainActivity : AppCompatActivity() {
                     }
         }
         findViewById<TextView>(R.id.btnShowCameraOnlyCompress).setOnClickListener {
-            ProPicker.with(this)
+            ImagePicker.with(this)
                     .cameraOnly()
                     .compressImage()
                     .start { resultCode, data ->
                         if (resultCode == RESULT_OK && data != null) {
 
-                            findViewById<ImageView>(R.id.iv).setImageURI(ProPicker.getPickerData(data)?.uri)
+                            findViewById<ImageView>(R.id.iv).setImageURI(ImagePicker.getPickerData(data)?.uri)
 
                         }
                     }

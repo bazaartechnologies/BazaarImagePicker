@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.imagepickerlibrary.R
-import com.example.imagepickerlibrary.image_picker.ProPicker
+import com.example.imagepickerlibrary.image_picker.ImagePicker
 import com.example.imagepickerlibrary.image_picker.ProviderHelper
 import com.example.imagepickerlibrary.image_picker.model.ImageProvider
 import com.example.imagepickerlibrary.util.D
@@ -38,7 +38,7 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
         setContentView(R.layout.activity_image_picker)
 
         imageProvider =
-                intent?.extras?.getSerializable(ProPicker.EXTRA_IMAGE_PROVIDER) as ImageProvider
+                intent?.extras?.getSerializable(ImagePicker.EXTRA_IMAGE_PROVIDER) as ImageProvider
 
         loadProvider(imageProvider)
         prepareGallery(ImageProvider.CAMERA)
@@ -73,7 +73,7 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
             if (!isRegistered){
                 isRegistered = true
                 singleResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-                    if (uri == null) finish()
+//                    if (uri == null)
                     uri?.let {
                         lifecycleScope.launch {
 //                            d.show()
@@ -93,7 +93,7 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
             if (!isRegistered){
                 isRegistered = true
                 multipleResult = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-                    if (uris == null) finish()
+//                    if (uris == null)
                     uris?.let {
                         lifecycleScope.launch {
                             d.show()

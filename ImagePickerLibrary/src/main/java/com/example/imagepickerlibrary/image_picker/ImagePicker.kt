@@ -20,7 +20,7 @@ import com.example.imagepickerlibrary.util.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object ProPicker {
+object ImagePicker {
     internal const val EXTRA_MIME_TYPES = "extra.mime_types"
     internal const val EXTRA_IMAGE_PROVIDER = "extra.image_provider"
     internal const val EXTRA_MULTI_SELECTION = "extra.multi_selection"
