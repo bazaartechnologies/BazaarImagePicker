@@ -2,9 +2,12 @@ package com.example.imagepickerlibrary.image_picker
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.model.Picker
 import com.example.imagepickerlibrary.image_picker.ui.ProPickerActivity
 import com.example.imagepickerlibrary.util.D
@@ -151,12 +154,14 @@ class ProviderHelper(private val activity: AppCompatActivity) {
 
     private fun startCrop(sourceUri: Uri, croppedUri: Uri) {
         val uCrop = UCrop.of(sourceUri, croppedUri)
-        val activity = activity as ProPickerActivity
-        val d = D.showProgressDialog(activity, "Processing")
-        d.show()
         val options = UCrop.Options()
 //        options.setCompressionFormat(FileUtil.getCompressFormat(extension))
         options.setCircleDimmedLayer(isCropOvalEnabled)
+        options.setShowCropGrid(false)
+//        options.setToolbarWidgetColor(activity.baseContext.resources.getColor(R.color.white))
+//        options.setColor(activity.baseContext.resources.getColor(R.color.white))
+////        options.setDimmedLayerColor(activity.baseContext.resources.getColor(R.color.white) )
+//        options.setActiveControlsWidgetColor(activity.baseContext.resources.getColor(R.color.white) )
         uCrop.withOptions(options)
 
         if (mCropAspectX > 0 && mCropAspectY > 0) {
@@ -189,11 +194,15 @@ class ProviderHelper(private val activity: AppCompatActivity) {
             // Getting the cropped image
             val resultUri = UCrop.getOutput(data)
             Log.d("CurrentDateTag Before", Date().toString())
+            val activity = activity as ProPickerActivity
+            val d = D.showProgressDialog(activity, "Processing")
+            d.show()
             val image = prepareImage(resultUri!!)
             val images = ArrayList<Picker>()
             images.add(image)
             Log.d("CurrentDateTag After", Date().toString())
-            setResultAndFinish(images)
+            d.hide()
+            setResultAndFinish (images)
 
         } else if (resultCode == UCrop.RESULT_ERROR) {
             val cropError = UCrop.getError(data!!)

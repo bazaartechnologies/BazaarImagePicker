@@ -150,7 +150,7 @@ object ImagePicker {
         /**
          * Only Pick image from gallery.
          */
-        fun galleryOnly(): Builder {
+        private fun galleryOnly(): Builder {
             this.imageProvider = ImageProvider.GALLERY
             return this
         }

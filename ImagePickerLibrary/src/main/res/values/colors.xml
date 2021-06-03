@@ -7,7 +7,17 @@
 
     <color name="black_54_percent">#89000000</color>
     <color name="black_66_percent">#66000000</color>
+    <color name="black">#000000</color>
     <color name="green">#008000</color>
     <color name="white">#ffffff</color>
+    <color name="dark_grey">#9e9e9e</color>
+
+    <!--uCrop Activity-->
+    <color name="ucrop_color_active_controls_color">@color/black</color>
+    <color name="ucrop_color_inactive_controls_color">@color/dark_grey</color>
+    <color name="ucrop_color_widget_rotate_mid_line">@color/white</color>
+    <color name="ucrop_color_active_aspect_ratio">@color/white</color>
+    <color name="ucrop_color_widget_text">@color/white</color>
+    <color name="ucrop_color_widget_background">@color/white</color>
 
 </resources>
