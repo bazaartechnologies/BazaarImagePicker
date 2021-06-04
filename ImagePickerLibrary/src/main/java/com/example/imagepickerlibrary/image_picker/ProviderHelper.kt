@@ -87,23 +87,15 @@ class ProviderHelper(private val activity: AppCompatActivity) {
             )
 
             val name = file.name
-            Log.d("CurrentDateTag", Date().toString())
             Picker(name, Uri.fromFile(file), file)
         } else {
             val file = File(FileUriUtils.getRealPath(activity.baseContext, uri) ?: "")
             val name = file.name
-            Log.d("CurrentDateTag", Date().toString())
             Picker(name, uri, file)
         }
     }
 
-    suspend fun performGalleryOperationForSingleSelection(uri: Uri)/*: ArrayList<Picker> */ {
-//        val image = prepareImage(uri)
-//        val images = ArrayList<Picker>()
-//        images.add(image)
-//        // setResultAndFinish(images)
-//        return images
-
+    suspend fun performGalleryOperationForSingleSelection(uri: Uri){
         when {
             isCropEnabled -> {
                 val croppedFile = FileUtil.getImageOutputDirectory(activity.baseContext)
@@ -155,13 +147,8 @@ class ProviderHelper(private val activity: AppCompatActivity) {
     private fun startCrop(sourceUri: Uri, croppedUri: Uri) {
         val uCrop = UCrop.of(sourceUri, croppedUri)
         val options = UCrop.Options()
-//        options.setCompressionFormat(FileUtil.getCompressFormat(extension))
         options.setCircleDimmedLayer(isCropOvalEnabled)
         options.setShowCropGrid(false)
-//        options.setToolbarWidgetColor(activity.baseContext.resources.getColor(R.color.white))
-//        options.setColor(activity.baseContext.resources.getColor(R.color.white))
-////        options.setDimmedLayerColor(activity.baseContext.resources.getColor(R.color.white) )
-//        options.setActiveControlsWidgetColor(activity.baseContext.resources.getColor(R.color.white) )
         uCrop.withOptions(options)
 
         if (mCropAspectX > 0 && mCropAspectY > 0) {
@@ -193,14 +180,12 @@ class ProviderHelper(private val activity: AppCompatActivity) {
             }
             // Getting the cropped image
             val resultUri = UCrop.getOutput(data)
-            Log.d("CurrentDateTag Before", Date().toString())
             val activity = activity as ProPickerActivity
             val d = D.showProgressDialog(activity, "Processing")
             d.show()
             val image = prepareImage(resultUri!!)
             val images = ArrayList<Picker>()
             images.add(image)
-            Log.d("CurrentDateTag After", Date().toString())
             d.hide()
             setResultAndFinish (images)
 

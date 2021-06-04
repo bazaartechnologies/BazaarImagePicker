@@ -40,8 +40,8 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
         imageProvider =
                 intent?.extras?.getSerializable(ImagePicker.EXTRA_IMAGE_PROVIDER) as ImageProvider
 
-        loadProvider(imageProvider)
         prepareGallery(ImageProvider.CAMERA)
+        loadProvider(imageProvider)
 
     }
 
@@ -69,17 +69,14 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
         else D.showProgressDialog(this, "Processing....", false)
 
         if (!providerHelper.getMultiSelection()) {
-            // Single choice
-            if (!isRegistered){
+            /**Single choice**/
+            if (!isRegistered) {
                 isRegistered = true
                 singleResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
 //                    if (uri == null)
                     uri?.let {
                         lifecycleScope.launch {
-//                            d.show()
-                            /*val images = */providerHelper.performGalleryOperationForSingleSelection(uri)
-//                            d.dismiss()
-//                            providerHelper.setResultAndFinish(images)
+                            providerHelper.performGalleryOperationForSingleSelection(uri)
                         }
                     }
 
@@ -89,11 +86,10 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
             if (provider == ImageProvider.GALLERY)
                 singleResult.launch(providerHelper.getGalleryMimeTypes())
         } else {
-            // Multiple choice
-            if (!isRegistered){
+            /** Multiple choice**/
+            if (!isRegistered) {
                 isRegistered = true
                 multipleResult = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-//                    if (uris == null)
                     uris?.let {
                         lifecycleScope.launch {
                             d.show()
@@ -117,7 +113,7 @@ internal class ProPickerActivity : ImageProviderFragment.OnFragmentInteractionLi
                 .commit()
     }
 
-    // Permission Sections
+    /**Permission Sections**/
     private fun havePermission() =
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 (ContextCompat.checkSelfPermission(

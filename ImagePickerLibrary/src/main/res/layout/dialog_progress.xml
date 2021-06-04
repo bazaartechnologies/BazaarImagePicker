@@ -13,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_below="@+id/pb"
-        android:text="Compressing..."
+        android:text=""
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textSize="18sp"
          />

@@ -19,6 +19,7 @@ import com.example.imagepickerlibrary.image_picker.ui.ProPickerActivity
 import com.example.imagepickerlibrary.util.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 object ImagePicker {
     internal const val EXTRA_MIME_TYPES = "extra.mime_types"
