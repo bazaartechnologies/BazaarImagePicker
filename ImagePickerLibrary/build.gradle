@@ -59,4 +59,8 @@ dependencies {
 
     // Ucrop
     implementation 'com.github.yalantis:ucrop:2.2.6'
+
+    //Camera 1
+    implementation 'com.otaliastudios:cameraview:2.7.0'
+
 }

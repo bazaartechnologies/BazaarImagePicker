@@ -1,16 +1,19 @@
 package com.example.imagepickerlibrary.image_picker.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.hardware.display.DisplayManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.SeekBar
@@ -25,6 +28,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.ProviderHelper
 import com.example.imagepickerlibrary.util.FileUtil
+import com.otaliastudios.cameraview.CameraListener
+import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.PictureResult
+import com.otaliastudios.cameraview.controls.Mode
+import com.otaliastudios.cameraview.size.SizeSelectors
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -39,6 +47,10 @@ internal class ImageProviderFragment : Fragment() {
 
     private var captureImageUri: Uri? = null
 
+    var HEIGHT = 0
+    var WIDTH = 0
+
+
     private val pref by lazy {
         requireContext().getSharedPreferences("propicker", Context.MODE_PRIVATE)
     }
@@ -52,6 +64,7 @@ internal class ImageProviderFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var cameraProvider: ProcessCameraProvider
     private lateinit var viewFinder: PreviewView
+    private lateinit var cameraView: CameraView
     private var displayId: Int = -1
     private var camera: Camera? = null
 
@@ -86,13 +99,31 @@ internal class ImageProviderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         container = view as RelativeLayout
-        viewFinder = container.findViewById(R.id.viewFinder)
+        val frameLayout = container.findViewById<FrameLayout>(R.id.fLayout)
+        val relativeMatchParent = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            viewFinder = PreviewView(requireContext())
+            viewFinder.layoutParams = relativeMatchParent
+            frameLayout.addView(viewFinder)
 
-        viewFinder.post {
-            setupCamera()
+//            viewFinder = container.findViewById(R.id.viewFinder)
+            viewFinder.visibility = View.VISIBLE
+            viewFinder.post {
+                setupCamera()
+
+                updateCameraUI()
+            }
+        } else {
+            cameraView = container.findViewById(R.id.cameraView)
+            cameraView.visibility = View.VISIBLE
 
             updateCameraUI()
+
+            setUpCameraOne()
         }
+
 
         iniGallery()
 
@@ -100,6 +131,31 @@ internal class ImageProviderFragment : Fragment() {
 
         // Every time the orientation of device changes, update rotation for use cases
         displayManager.registerDisplayListener(displayListener, null)
+
+    }
+
+    private fun setUpCameraOne() {
+        cameraView.mode = Mode.PICTURE
+        //            if (options.getMode() === Options.Mode.Picture) {
+//                camera.setAudio(Audio.OFF)
+//            }
+        val width = SizeSelectors.minWidth(WIDTH)
+        val height = SizeSelectors.minHeight(HEIGHT)
+        val dimensions = SizeSelectors.and(width, height) // Matches sizes bigger than width X height
+
+        val ratio = SizeSelectors.aspectRatio(com.otaliastudios.cameraview.size.AspectRatio.of(1, 2), 0f) // Matches 1:2 sizes.
+
+        val ratio3 = SizeSelectors.aspectRatio(com.otaliastudios.cameraview.size.AspectRatio.of(2, 3), 0f) // Matches 2:3 sizes.
+
+        val ratio2 = SizeSelectors.aspectRatio(com.otaliastudios.cameraview.size.AspectRatio.of(9, 16), 0f) // Matches 9:16 sizes.
+
+        val result = SizeSelectors.or(
+                SizeSelectors.and(ratio, dimensions),
+                SizeSelectors.and(ratio2, dimensions),
+                SizeSelectors.and(ratio3, dimensions)
+        )
+        cameraView.setPictureSize(result)
+        cameraView.setLifecycleOwner(this)
 
     }
 
@@ -136,7 +192,14 @@ internal class ImageProviderFragment : Fragment() {
         }
 
         container.findViewById<ImageView>(R.id.fabCamera).setOnClickListener {
-            takePhoto()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                takePhoto()
+
+            } else {
+                cameraView.takePicture()
+                CameraOneListener()
+            }
+
         }
         container.findViewById<ImageView>(R.id.flipCamera).setOnClickListener {
             flipCamera()
@@ -156,6 +219,14 @@ internal class ImageProviderFragment : Fragment() {
 
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
                 })
+    }
+
+    private fun CameraOneListener() {
+        cameraView.addCameraListener(object : CameraListener() {
+            override fun onPictureTaken(result: PictureResult) {
+                super.onPictureTaken(result)
+            }
+        })
     }
 
     private fun takePhoto() {
@@ -402,6 +473,9 @@ internal class ImageProviderFragment : Fragment() {
         super.onDestroy()
         cameraExecutor.shutdown()
         displayManager.unregisterDisplayListener(displayListener)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            cameraView.destroy()
+
 
     }
 
@@ -439,6 +513,25 @@ internal class ImageProviderFragment : Fragment() {
         fun onFragmentInteraction()
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            cameraView.open()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            cameraView.close()
+    }
+
+    fun getScreenSize(activity: Activity) {
+        val displayMetrics = DisplayMetrics()
+        activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+        HEIGHT = displayMetrics.heightPixels
+        WIDTH = displayMetrics.widthPixels
+    }
 
 }
 

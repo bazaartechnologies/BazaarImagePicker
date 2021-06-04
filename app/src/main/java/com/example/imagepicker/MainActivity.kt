@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
                     .cameraOnly()
                     .maxResultSize(200, 200)
                     .compressImage(1024,1024)
-                    .cropOval()
+                    .cropSquare()
                     .start { resultCode, data ->
                         if (resultCode == RESULT_OK && data != null) {
                             val picker = ImagePicker.getPickerData(data)
