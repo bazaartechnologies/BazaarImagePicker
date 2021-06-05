@@ -27,11 +27,13 @@
         android:id="@+id/flipCamera"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        app:tint="@color/white"
+        android:tint="@color/white"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
-        android:visibility="gone"
-        android:src="@drawable/ic_baseline_flip_camera_android_24" />
+        android:visibility="visible"
+        android:src="@drawable/switch_camera" />
 
     <ImageView
         android:id="@+id/btnFlash"
@@ -47,11 +49,12 @@
         android:id="@+id/btnGallery"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:tint="@color/white"
+        app:tint="@color/white"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
         android:layout_margin="16dp"
-        app:tint="@color/white"
-        android:src="@android:drawable/gallery_thumb" />
+        android:src="@drawable/gallery" />
 
     <SeekBar
         android:id="@+id/zoomSeekBar"

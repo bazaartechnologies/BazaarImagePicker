@@ -30,7 +30,9 @@ import com.example.imagepickerlibrary.image_picker.ProviderHelper
 import com.example.imagepickerlibrary.util.FileUtil
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.FileCallback
 import com.otaliastudios.cameraview.PictureResult
+import com.otaliastudios.cameraview.controls.Facing
 import com.otaliastudios.cameraview.controls.Mode
 import com.otaliastudios.cameraview.size.SizeSelectors
 import kotlinx.coroutines.launch
@@ -50,6 +52,7 @@ internal class ImageProviderFragment : Fragment() {
     var HEIGHT = 0
     var WIDTH = 0
 
+    var isFrontFacing = false
 
     private val pref by lazy {
         requireContext().getSharedPreferences("propicker", Context.MODE_PRIVATE)
@@ -91,8 +94,8 @@ internal class ImageProviderFragment : Fragment() {
 
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_image_provider, container, false)
     }
@@ -101,8 +104,9 @@ internal class ImageProviderFragment : Fragment() {
         container = view as RelativeLayout
         val frameLayout = container.findViewById<FrameLayout>(R.id.fLayout)
         val relativeMatchParent = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT)
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             viewFinder = PreviewView(requireContext())
             viewFinder.layoutParams = relativeMatchParent
@@ -141,20 +145,30 @@ internal class ImageProviderFragment : Fragment() {
 //            }
         val width = SizeSelectors.minWidth(WIDTH)
         val height = SizeSelectors.minHeight(HEIGHT)
-        val dimensions = SizeSelectors.and(width, height) // Matches sizes bigger than width X height
+        val dimensions =
+            SizeSelectors.and(width, height) // Matches sizes bigger than width X height
 
-        val ratio = SizeSelectors.aspectRatio(com.otaliastudios.cameraview.size.AspectRatio.of(1, 2), 0f) // Matches 1:2 sizes.
+        val ratio = SizeSelectors.aspectRatio(
+            com.otaliastudios.cameraview.size.AspectRatio.of(1, 2),
+            0f
+        ) // Matches 1:2 sizes.
 
-        val ratio3 = SizeSelectors.aspectRatio(com.otaliastudios.cameraview.size.AspectRatio.of(2, 3), 0f) // Matches 2:3 sizes.
+        val ratio3 = SizeSelectors.aspectRatio(
+            com.otaliastudios.cameraview.size.AspectRatio.of(2, 3),
+            0f
+        ) // Matches 2:3 sizes.
 
-        val ratio2 = SizeSelectors.aspectRatio(com.otaliastudios.cameraview.size.AspectRatio.of(9, 16), 0f) // Matches 9:16 sizes.
+        val ratio2 = SizeSelectors.aspectRatio(
+            com.otaliastudios.cameraview.size.AspectRatio.of(9, 16),
+            0f
+        ) // Matches 9:16 sizes.
 
         val result = SizeSelectors.or(
-                SizeSelectors.and(ratio, dimensions),
-                SizeSelectors.and(ratio2, dimensions),
-                SizeSelectors.and(ratio3, dimensions)
+            SizeSelectors.and(ratio, dimensions),
+            SizeSelectors.and(ratio2, dimensions),
+            SizeSelectors.and(ratio3, dimensions)
         )
-        cameraView.setPictureSize(result)
+//        cameraView.setPictureSize(result)
         cameraView.setLifecycleOwner(this)
 
     }
@@ -176,14 +190,18 @@ internal class ImageProviderFragment : Fragment() {
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
                     fabCameraBg.visibility = View.VISIBLE
-                    fabCameraBg.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(AccelerateDecelerateInterpolator()).start()
-                    fabCamera.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(AccelerateDecelerateInterpolator()).start()
+                    fabCameraBg.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300)
+                        .setInterpolator(AccelerateDecelerateInterpolator()).start()
+                    fabCamera.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300)
+                        .setInterpolator(AccelerateDecelerateInterpolator()).start()
 
                 }
                 MotionEvent.ACTION_UP -> {
                     fabCameraBg.visibility = View.GONE
-                    fabCameraBg.animate().scaleX(1f).scaleY(1f).setDuration(300).setInterpolator(AccelerateDecelerateInterpolator()).start()
-                    fabCamera.animate().scaleX(1f).scaleY(1f).setDuration(300).setInterpolator(AccelerateDecelerateInterpolator()).start()
+                    fabCameraBg.animate().scaleX(1f).scaleY(1f).setDuration(300)
+                        .setInterpolator(AccelerateDecelerateInterpolator()).start()
+                    fabCamera.animate().scaleX(1f).scaleY(1f).setDuration(300)
+                        .setInterpolator(AccelerateDecelerateInterpolator()).start()
 
                 }
             }
@@ -202,29 +220,62 @@ internal class ImageProviderFragment : Fragment() {
 
         }
         container.findViewById<ImageView>(R.id.flipCamera).setOnClickListener {
-            flipCamera()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                flipCamera()
+            else
+                flipCameraOne()
+
         }
 
         container.findViewById<SeekBar>(R.id.zoomSeekBar)
-                .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(
-                            seekBar: SeekBar?,
-                            progress: Int,
-                            fromUser: Boolean
-                    ) {
-                        camera!!.cameraControl.setLinearZoom(progress / 100.toFloat())
-                    }
+            .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    camera!!.cameraControl.setLinearZoom(progress / 100.toFloat())
+                }
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-                })
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+    }
+
+    private fun flipCameraOne() {
+        if (isFrontFacing) {
+            isFrontFacing = false
+            cameraView.facing = Facing.BACK
+
+        } else {
+            isFrontFacing = true
+            cameraView.facing = Facing.FRONT
+
+        }
+
     }
 
     private fun CameraOneListener() {
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(result: PictureResult) {
                 super.onPictureTaken(result)
+                val photoFile = FileUtil.getImageOutputDirectory(requireContext())
+
+                result.toFile(photoFile, FileCallback {
+                    captureImageUri = Uri.fromFile(it)
+
+                    captureImageUri?.let {
+                        lifecycleScope.launch {
+                            providerHelper.performCameraOperation(captureImageUri!!)
+
+                            val msg = "Photo capture succeeded: $captureImageUri"
+                            //Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                            Log.d(TAG, msg)
+                        }
+                    }
+                })
+
             }
         })
     }
@@ -244,34 +295,34 @@ internal class ImageProviderFragment : Fragment() {
         }
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile)
-                .setMetadata(metadata)
-                .build()
+            .setMetadata(metadata)
+            .build()
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
         imageCapture.takePicture(
-                outputOptions,
-                ContextCompat.getMainExecutor(requireContext()),
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onError(exc: ImageCaptureException) {
-                        Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                    }
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                }
 
-                    override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
 
-                        captureImageUri = Uri.fromFile(photoFile)
+                    captureImageUri = Uri.fromFile(photoFile)
 
-                        captureImageUri?.let {
-                            lifecycleScope.launch {
-                                providerHelper.performCameraOperation(captureImageUri!!)
+                    captureImageUri?.let {
+                        lifecycleScope.launch {
+                            providerHelper.performCameraOperation(captureImageUri!!)
 
-                                val msg = "Photo capture succeeded: $captureImageUri"
-                                //Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                                Log.d(TAG, msg)
-                            }
+                            val msg = "Photo capture succeeded: $captureImageUri"
+                            //Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                            Log.d(TAG, msg)
                         }
                     }
-                })
+                }
+            })
     }
 
     private fun setupCamera() {
@@ -327,18 +378,18 @@ internal class ImageProviderFragment : Fragment() {
 
         // Preview
         val preview = Preview.Builder()
-                // We request aspect ratio but no resolution
-                .setTargetAspectRatio(screenAspectRatio)
-                // Set initial target rotation
-                .setTargetRotation(rotation)
-                .build().also {
-                    it.setSurfaceProvider(viewFinder.surfaceProvider)
-                }
+            // We request aspect ratio but no resolution
+            .setTargetAspectRatio(screenAspectRatio)
+            // Set initial target rotation
+            .setTargetRotation(rotation)
+            .build().also {
+                it.setSurfaceProvider(viewFinder.surfaceProvider)
+            }
 
         imageCapture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .setTargetAspectRatio(screenAspectRatio)
-                .build()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .setTargetAspectRatio(screenAspectRatio)
+            .build()
 
         orientationEventListener = object : OrientationEventListener(requireContext()) {
             override fun onOrientationChanged(orientation: Int) {
@@ -374,7 +425,7 @@ internal class ImageProviderFragment : Fragment() {
 
             // Bind use cases to camera
             camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture
+                this, cameraSelector, preview, imageCapture
             )
 
             camera?.let {

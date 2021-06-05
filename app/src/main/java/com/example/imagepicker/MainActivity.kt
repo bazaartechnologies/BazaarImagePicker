@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.btnShowCameraOnlyWithCrop).setOnClickListener {
             ImagePicker.with(this)
                     .cameraOnly()
-                    .maxResultSize(200, 200)
+//                    .maxResultSize(200, 200)
                     .compressImage(1024,1024)
-                    .cropSquare()
+                    .cropOval()
                     .start { resultCode, data ->
                         if (resultCode == RESULT_OK && data != null) {
                             val picker = ImagePicker.getPickerData(data)
