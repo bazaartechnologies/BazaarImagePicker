@@ -25,13 +25,13 @@
 
     <ImageView
         android:id="@+id/flipCamera"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         app:tint="@color/white"
+        android:padding="16dp"
         android:tint="@color/white"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
         android:visibility="visible"
         android:src="@drawable/switch_camera" />
 
@@ -47,13 +47,13 @@
 
     <ImageView
         android:id="@+id/btnGallery"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:tint="@color/white"
         app:tint="@color/white"
+        android:padding="16dp"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="16dp"
         android:src="@drawable/gallery" />
 
     <SeekBar

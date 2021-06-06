@@ -36,6 +36,7 @@ import com.otaliastudios.cameraview.controls.Facing
 import com.otaliastudios.cameraview.controls.Mode
 import com.otaliastudios.cameraview.size.SizeSelectors
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
@@ -43,20 +44,22 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal class ImageProviderFragment : Fragment() {
-    private val TAG = "ImageProviderFragment"
     private lateinit var container: RelativeLayout
     private val providerHelper by lazy { ProviderHelper(requireActivity() as AppCompatActivity) }
 
     private var captureImageUri: Uri? = null
 
-    var HEIGHT = 0
-    var WIDTH = 0
+    var height = 0
+    var width = 0
 
     var isFrontFacing = false
+    var isPictureCaptured = false
 
     private val pref by lazy {
         requireContext().getSharedPreferences("propicker", Context.MODE_PRIVATE)
     }
+    // Create time-stamped output file to hold the image
+    lateinit var photoFile : File
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -107,28 +110,23 @@ internal class ImageProviderFragment : Fragment() {
             RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT
         )
+        photoFile = FileUtil.getImageOutputDirectory(requireContext())
+        /**if build version greater than lollipop, use CameraX otherwise Camera1 Api*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             viewFinder = PreviewView(requireContext())
             viewFinder.layoutParams = relativeMatchParent
             frameLayout.addView(viewFinder)
-
-//            viewFinder = container.findViewById(R.id.viewFinder)
             viewFinder.visibility = View.VISIBLE
             viewFinder.post {
                 setupCamera()
-
-                updateCameraUI()
             }
         } else {
             cameraView = container.findViewById(R.id.cameraView)
             cameraView.visibility = View.VISIBLE
-
-            updateCameraUI()
-
             setUpCameraOne()
+
         }
-
-
+        updateCameraUI()
         iniGallery()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -143,8 +141,8 @@ internal class ImageProviderFragment : Fragment() {
         //            if (options.getMode() === Options.Mode.Picture) {
 //                camera.setAudio(Audio.OFF)
 //            }
-        val width = SizeSelectors.minWidth(WIDTH)
-        val height = SizeSelectors.minHeight(HEIGHT)
+        val width = SizeSelectors.minWidth(width)
+        val height = SizeSelectors.minHeight(height)
         val dimensions =
             SizeSelectors.and(width, height) // Matches sizes bigger than width X height
 
@@ -171,6 +169,22 @@ internal class ImageProviderFragment : Fragment() {
 //        cameraView.setPictureSize(result)
         cameraView.setLifecycleOwner(this)
 
+        cameraView.addCameraListener(object : CameraListener() {
+            override fun onPictureTaken(result: PictureResult) {
+                super.onPictureTaken(result)
+
+                result.toFile(photoFile, FileCallback {
+                    captureImageUri = Uri.fromFile(it)
+
+                    captureImageUri?.let {
+                        lifecycleScope.launch {
+                            providerHelper.performCameraOperation(captureImageUri!!)
+                        }
+                    }
+                })
+
+            }
+        })
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -210,24 +224,24 @@ internal class ImageProviderFragment : Fragment() {
         }
 
         container.findViewById<ImageView>(R.id.fabCamera).setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                takePhoto()
 
+            /** Check build version to take picture*/
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                takePhoto(photoFile)
             } else {
                 cameraView.takePicture()
-                CameraOneListener()
             }
-
         }
         container.findViewById<ImageView>(R.id.flipCamera).setOnClickListener {
+            /** Check build version to flip camera*/
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 flipCamera()
             else
                 flipCameraOne()
-
         }
 
-        container.findViewById<SeekBar>(R.id.zoomSeekBar)
+        /** For zoom camera*/
+/*        container.findViewById<SeekBar>(R.id.zoomSeekBar)
             .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
@@ -240,52 +254,22 @@ internal class ImageProviderFragment : Fragment() {
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            })
+            })*/
     }
 
     private fun flipCameraOne() {
         if (isFrontFacing) {
             isFrontFacing = false
             cameraView.facing = Facing.BACK
-
         } else {
             isFrontFacing = true
             cameraView.facing = Facing.FRONT
-
         }
-
     }
 
-    private fun CameraOneListener() {
-        cameraView.addCameraListener(object : CameraListener() {
-            override fun onPictureTaken(result: PictureResult) {
-                super.onPictureTaken(result)
-                val photoFile = FileUtil.getImageOutputDirectory(requireContext())
-
-                result.toFile(photoFile, FileCallback {
-                    captureImageUri = Uri.fromFile(it)
-
-                    captureImageUri?.let {
-                        lifecycleScope.launch {
-                            providerHelper.performCameraOperation(captureImageUri!!)
-
-                            val msg = "Photo capture succeeded: $captureImageUri"
-                            //Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                            Log.d(TAG, msg)
-                        }
-                    }
-                })
-
-            }
-        })
-    }
-
-    private fun takePhoto() {
+    private fun takePhoto(photoFile: File) {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
-
-        // Create time-stamped output file to hold the image
-        val photoFile = FileUtil.getImageOutputDirectory(requireContext())
 
         // Setup image capture metadata
         val metadata = ImageCapture.Metadata().apply {
@@ -315,10 +299,6 @@ internal class ImageProviderFragment : Fragment() {
                     captureImageUri?.let {
                         lifecycleScope.launch {
                             providerHelper.performCameraOperation(captureImageUri!!)
-
-                            val msg = "Photo capture succeeded: $captureImageUri"
-                            //Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                            Log.d(TAG, msg)
                         }
                     }
                 }
@@ -466,21 +446,25 @@ internal class ImageProviderFragment : Fragment() {
     private fun initFlash() {
         val btnFlash = view?.findViewById<ImageView>(R.id.btnFlash)
 
-        if (camera!!.cameraInfo.hasFlashUnit()) {
+        /**Check build version for flash*/
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (camera!!.cameraInfo.hasFlashUnit()) {
 //            btnFlash?.visibility = View.VISIBLE
 
-            btnFlash?.setOnClickListener {
-                camera!!.cameraControl.enableTorch(camera!!.cameraInfo.torchState.value == TorchState.OFF)
-            }
-        } else btnFlash?.visibility = View.GONE
+                btnFlash?.setOnClickListener {
+                    camera!!.cameraControl.enableTorch(camera!!.cameraInfo.torchState.value == TorchState.OFF)
+                }
+            } else btnFlash?.visibility = View.GONE
 
-        camera!!.cameraInfo.torchState.observe(viewLifecycleOwner, Observer { torchState ->
-            if (torchState == TorchState.OFF) {
-                btnFlash?.setImageResource(R.drawable.ic_baseline_flash_on_24)
-            } else {
-                btnFlash?.setImageResource(R.drawable.ic_baseline_flash_off_24)
-            }
-        })
+            camera!!.cameraInfo.torchState.observe(viewLifecycleOwner, Observer { torchState ->
+                if (torchState == TorchState.OFF) {
+                    btnFlash?.setImageResource(R.drawable.ic_baseline_flash_on_24)
+                } else {
+                    btnFlash?.setImageResource(R.drawable.ic_baseline_flash_off_24)
+                }
+            })
+        }
+
     }
 
     private fun iniGallery() {
@@ -526,13 +510,10 @@ internal class ImageProviderFragment : Fragment() {
         displayManager.unregisterDisplayListener(displayListener)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
             cameraView.destroy()
-
-
     }
 
     override fun onStop() {
         super.onStop()
-
         orientationEventListener?.disable()
         orientationEventListener = null
     }
@@ -544,6 +525,7 @@ internal class ImageProviderFragment : Fragment() {
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
+        private const val TAG = "ImageProviderFragment"
     }
 
     override fun onAttach(context: Context) {
@@ -551,7 +533,7 @@ internal class ImageProviderFragment : Fragment() {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-//            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(requireContext().toString() + " must implement OnFragmentInteractionListener")
         }
     }
 
@@ -564,24 +546,25 @@ internal class ImageProviderFragment : Fragment() {
         fun onFragmentInteraction()
     }
 
-
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             cameraView.open()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             cameraView.close()
+        }
     }
 
     fun getScreenSize(activity: Activity) {
         val displayMetrics = DisplayMetrics()
         activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
-        HEIGHT = displayMetrics.heightPixels
-        WIDTH = displayMetrics.widthPixels
+        height = displayMetrics.heightPixels
+        width = displayMetrics.widthPixels
     }
 
 }
