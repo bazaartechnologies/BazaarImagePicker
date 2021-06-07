@@ -149,6 +149,9 @@ class ProviderHelper(private val activity: AppCompatActivity) {
         val options = UCrop.Options()
         options.setCircleDimmedLayer(isCropOvalEnabled)
         options.setShowCropGrid(false)
+        options.setShowCropFrame(false)
+        options.setHideBottomControls(true)
+        options.withAspectRatio(1f, 1f)
         uCrop.withOptions(options)
 
         if (mCropAspectX > 0 && mCropAspectY > 0) {
