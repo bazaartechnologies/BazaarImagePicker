@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.imagepickerlibrary.R
+import com.example.imagepickerlibrary.image_picker.ImagePicker
 import com.example.imagepickerlibrary.image_picker.ProviderHelper
 import com.example.imagepickerlibrary.util.FileUtil
 import com.otaliastudios.cameraview.CameraListener
@@ -58,8 +59,9 @@ internal class ImageProviderFragment : Fragment() {
     private val pref by lazy {
         requireContext().getSharedPreferences("propicker", Context.MODE_PRIVATE)
     }
+
     // Create time-stamped output file to hold the image
-    lateinit var photoFile : File
+    lateinit var photoFile: File
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -73,6 +75,9 @@ internal class ImageProviderFragment : Fragment() {
     private lateinit var cameraView: CameraView
     private var displayId: Int = -1
     private var camera: Camera? = null
+
+    private var gallleryIcon = R.drawable.gallery
+    private var cameraSwitchIcon = R.drawable.switch_camera
 
     private val displayManager by lazy {
         requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
@@ -100,6 +105,10 @@ internal class ImageProviderFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        arguments?.apply {
+            gallleryIcon = getInt(ImagePicker.EXTRA_GALLERY_ICON)
+            cameraSwitchIcon = getInt(ImagePicker.EXTRA_CAMERA_SWITCH_ICON)
+        }
         return inflater.inflate(R.layout.fragment_image_provider, container, false)
     }
 
@@ -127,7 +136,6 @@ internal class ImageProviderFragment : Fragment() {
 
         }
         updateCameraUI()
-        iniGallery()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -232,7 +240,9 @@ internal class ImageProviderFragment : Fragment() {
                 cameraView.takePicture()
             }
         }
-        container.findViewById<ImageView>(R.id.flipCamera).setOnClickListener {
+        val flipCamera = container.findViewById<ImageView>(R.id.flipCamera)
+        flipCamera.setImageResource(cameraSwitchIcon)
+        flipCamera.setOnClickListener {
             /** Check build version to flip camera*/
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 flipCamera()
@@ -255,6 +265,14 @@ internal class ImageProviderFragment : Fragment() {
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })*/
+        val btnGallery = container.findViewById<ImageView>(R.id.btnGallery)
+        btnGallery?.setImageResource(gallleryIcon)
+        btnGallery?.setOnClickListener {
+            if (mListener != null) {
+                mListener!!.onFragmentInteraction()
+            }
+        }
+
     }
 
     private fun flipCameraOne() {
@@ -465,15 +483,6 @@ internal class ImageProviderFragment : Fragment() {
             })
         }
 
-    }
-
-    private fun iniGallery() {
-        val btnGallery = view?.findViewById<ImageView>(R.id.btnGallery)
-        btnGallery?.setOnClickListener {
-            if (mListener != null) {
-                mListener!!.onFragmentInteraction()
-            }
-        }
     }
 
     /**

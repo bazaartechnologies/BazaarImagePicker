@@ -34,6 +34,8 @@ object ImagePicker {
     internal const val EXTRA_MAX_WIDTH = "extra.max_width"
     internal const val EXTRA_MAX_HEIGHT = "extra.max_height"
     internal const val EXTRA_IS_TO_COMPRESS = "extra._is_to_compress"
+    internal const val EXTRA_GALLERY_ICON = "extra.gallery.icon"
+    internal const val EXTRA_CAMERA_SWITCH_ICON = "extra.camera_switch.icon"
 
     @JvmStatic
     fun with(activity: Activity): Builder {
@@ -107,6 +109,9 @@ object ImagePicker {
 
         private var imageProvider = ImageProvider.BOTH
 
+        private var galleryIcon = R.drawable.gallery
+        private var cameraSwitchIcon = R.drawable.switch_camera
+
         // Mime types restrictions for gallery. by default all mime types are valid
         private var mimeTypes: Array<String> = arrayOf("image/png", "image/jpeg", "image/jpg")
 
@@ -145,6 +150,16 @@ object ImagePicker {
          */
         fun cameraOnly(): Builder {
             this.imageProvider = ImageProvider.CAMERA
+            return this
+        }
+
+        fun setGalleryIcon(galleryIcon: Int): Builder {
+            this.galleryIcon = galleryIcon
+            return this
+        }
+
+        fun setCameraSwitchIcon(cameraSwitchIcon: Int): Builder {
+            this.cameraSwitchIcon = cameraSwitchIcon
             return this
         }
 
@@ -224,7 +239,7 @@ object ImagePicker {
          * */
         @JvmSuppressWildcards
         @JvmOverloads
-        fun compressImage( maxWidth: Int = 612, maxHeight: Int = 816): Builder {
+        fun compressImage(maxWidth: Int = 612, maxHeight: Int = 816): Builder {
             if (maxHeight > 10 && maxWidth > 10) {
                 this.maxWidth = maxWidth
                 this.maxHeight = maxHeight
@@ -235,7 +250,7 @@ object ImagePicker {
         }
 
         // TODO
-        private fun compressVideo() : Builder {
+        private fun compressVideo(): Builder {
 
             return this
         }
@@ -346,6 +361,8 @@ object ImagePicker {
                 putFloat(EXTRA_CROP_Y, cropY)
                 putInt(EXTRA_MAX_WIDTH, maxWidth)
                 putInt(EXTRA_MAX_HEIGHT, maxHeight)
+                putInt(EXTRA_GALLERY_ICON, galleryIcon)
+                putInt(EXTRA_CAMERA_SWITCH_ICON, cameraSwitchIcon)
 
             }
         }

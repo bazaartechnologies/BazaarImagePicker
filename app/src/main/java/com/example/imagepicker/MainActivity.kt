@@ -14,18 +14,20 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.btnShowCameraOnlyWithCrop).setOnClickListener {
             ImagePicker.with(this)
-                    .cameraOnly()
+                .cameraOnly()
 //                    .maxResultSize(200, 200)
-                    .compressImage(1024,1024)
-                    .cropOval()
-                    .start { resultCode, data ->
-                        if (resultCode == RESULT_OK && data != null) {
-                            val picker = ImagePicker.getPickerData(data)
+                .compressImage(1024, 1024)
+                .cropOval()
+                .setGalleryIcon(R.drawable.gallery)
+                .setCameraSwitchIcon(R.drawable.switch_camera)
+                .start { resultCode, data ->
+                    if (resultCode == RESULT_OK && data != null) {
+                        val picker = ImagePicker.getPickerData(data)
 
-                            findViewById<ImageView>(R.id.iv).setImageURI(picker?.uri)
+                        findViewById<ImageView>(R.id.iv).setImageURI(picker?.uri)
 
-                        }
                     }
+                }
         }
     }
 }
