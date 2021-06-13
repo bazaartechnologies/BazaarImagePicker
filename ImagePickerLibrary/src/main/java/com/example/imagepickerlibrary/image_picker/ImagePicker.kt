@@ -15,11 +15,10 @@ import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.model.Picker
 import com.example.imagepickerlibrary.image_picker.model.ImageProvider
-import com.example.imagepickerlibrary.image_picker.ui.ProPickerActivity
+import com.example.imagepickerlibrary.image_picker.ui.ImagePickerActivity
 import com.example.imagepickerlibrary.util.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 object ImagePicker {
     internal const val EXTRA_MIME_TYPES = "extra.mime_types"
@@ -325,7 +324,7 @@ object ImagePicker {
          * Start ImagePickerActivity with given Argument
          */
         private fun startActivity(completionHandler: ((resultCode: Int, data: Intent?) -> Unit)? = null) {
-            val intent = Intent(activity, ProPickerActivity::class.java)
+            val intent = Intent(activity, ImagePickerActivity::class.java)
             intent.putExtras(getBundle())
             if (fragment != null) {
 

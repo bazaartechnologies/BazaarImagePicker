@@ -2,15 +2,12 @@ package com.example.imagepickerlibrary.image_picker
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.model.Picker
-import com.example.imagepickerlibrary.image_picker.ui.ProPickerActivity
-import com.example.imagepickerlibrary.util.D
+import com.example.imagepickerlibrary.image_picker.ui.ImagePickerActivity
+import com.example.imagepickerlibrary.util.ProgressDialog
 import com.example.imagepickerlibrary.util.FileUriUtils
 import com.example.imagepickerlibrary.util.FileUtil
 import com.yalantis.ucrop.UCrop
@@ -183,8 +180,8 @@ class ProviderHelper(private val activity: AppCompatActivity) {
             }
             // Getting the cropped image
             val resultUri = UCrop.getOutput(data)
-            val activity = activity as ProPickerActivity
-            val d = D.showProgressDialog(activity, "Processing")
+            val activity = activity as ImagePickerActivity
+            val d = ProgressDialog.showProgressDialog(activity, "Processing")
             d.show()
             val image = prepareImage(resultUri!!)
             val images = ArrayList<Picker>()

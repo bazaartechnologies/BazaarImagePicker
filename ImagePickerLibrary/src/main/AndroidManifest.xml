@@ -13,7 +13,7 @@
     <application >
 
         <activity
-            android:name="com.example.imagepickerlibrary.image_picker.ui.ProPickerActivity"
+            android:name="com.example.imagepickerlibrary.image_picker.ui.ImagePickerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
