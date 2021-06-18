@@ -63,9 +63,9 @@ object FileUtil {
         val file = getImageOutputDirectory(context)
 
         try {
-            // Compress the bitmap and save in png format
+            // Compress the bitmap and save in jpeg format
             val stream: OutputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
             stream.flush()
             stream.close()
         } catch (e: IOException) {
@@ -77,7 +77,7 @@ object FileUtil {
     }
 
     /**
-     * It creates a image file with png extension
+     * It creates a image file with jpg extension
      * */
     fun getImageOutputDirectory(context: Context): File {
 
@@ -94,13 +94,13 @@ object FileUtil {
                 mediaDir,
                 SimpleDateFormat(
                     FILENAME_FORMAT, Locale.US
-                ).format(System.currentTimeMillis()) + ".png"
+                ).format(System.currentTimeMillis()) + ".jpg"
             )
         else File(
             context.filesDir,
             SimpleDateFormat(
                 FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + ".png"
+            ).format(System.currentTimeMillis()) + ".jpg"
         )
     }
 
@@ -199,7 +199,7 @@ object FileUtil {
              out = FileOutputStream(file)
 
  //          write the compressed bitmap at the destination specified by filename.
-             scaledBitmap!!.compress(Bitmap.CompressFormat.PNG, 75, out)
+             scaledBitmap!!.compress(Bitmap.CompressFormat.JPEG, 75, out)
          } catch (e: FileNotFoundException) {
              e.printStackTrace()
          }

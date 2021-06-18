@@ -15,8 +15,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.btnShowCameraOnlyWithCrop).setOnClickListener {
             ImagePicker.with(this)
                 .cameraOnly()
-//                    .maxResultSize(200, 200)
-//                .compressImage(1024, 1024)
+//                .maxResultSize(200, 200)
+//                .compressImage(20, 20)
                 .cropOval()
                 .setGalleryIcon(R.drawable.gallery)
                 .setCameraSwitchIcon(R.drawable.switch_camera)
