@@ -20,6 +20,7 @@ import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.ImagePicker
 import com.example.imagepickerlibrary.image_picker.ImagePicker.EXTRA_CAMERA_SWITCH_ICON
 import com.example.imagepickerlibrary.image_picker.ImagePicker.EXTRA_GALLERY_ICON
+import com.example.imagepickerlibrary.image_picker.ImagePicker.EXTRA_IMAGE_PROVIDER
 import com.example.imagepickerlibrary.image_picker.ProviderHelper
 import com.example.imagepickerlibrary.image_picker.model.ImageProvider
 import com.example.imagepickerlibrary.util.ProgressDialog
@@ -63,6 +64,13 @@ internal class ImagePickerActivity : ImageProviderFragment.OnFragmentInteraction
                 prepareGallery(ImageProvider.GALLERY)
             }
             ImageProvider.CAMERA -> {
+                if (havePermission()) {
+                    replaceFragment(ImageProviderFragment.newInstance())
+                } else {
+                    requestPermissions()
+                }
+            }
+            ImageProvider.BOTH_WITH_CUSTOM -> {
                 if (havePermission()) {
                     replaceFragment(ImageProviderFragment.newInstance())
                 } else {
@@ -129,6 +137,7 @@ internal class ImagePickerActivity : ImageProviderFragment.OnFragmentInteraction
             EXTRA_CAMERA_SWITCH_ICON,
             switchCameraIcon
         )
+        fragmentBundle.putSerializable(EXTRA_IMAGE_PROVIDER, imageProvider)
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, fragment.javaClass, fragmentBundle)
             .commit()

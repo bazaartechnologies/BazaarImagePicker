@@ -152,6 +152,11 @@ object ImagePicker {
             return this
         }
 
+        fun bothWithCustom() : Builder{
+            this.imageProvider = ImageProvider.BOTH_WITH_CUSTOM
+            return this
+        }
+
         fun setGalleryIcon(galleryIcon: Int): Builder {
             this.galleryIcon = galleryIcon
             return this

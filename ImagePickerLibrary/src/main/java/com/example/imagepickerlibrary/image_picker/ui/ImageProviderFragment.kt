@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.ImagePicker
 import com.example.imagepickerlibrary.image_picker.ProviderHelper
+import com.example.imagepickerlibrary.image_picker.model.ImageProvider
 import com.example.imagepickerlibrary.util.FileUtil
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
@@ -78,6 +79,7 @@ internal class ImageProviderFragment : Fragment() {
 
     private var gallleryIcon = R.drawable.gallery
     private var cameraSwitchIcon = R.drawable.switch_camera
+    private var imageProvider: ImageProvider = ImageProvider.BOTH_WITH_CUSTOM
 
     private val displayManager by lazy {
         requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
@@ -108,6 +110,8 @@ internal class ImageProviderFragment : Fragment() {
         arguments?.apply {
             gallleryIcon = getInt(ImagePicker.EXTRA_GALLERY_ICON)
             cameraSwitchIcon = getInt(ImagePicker.EXTRA_CAMERA_SWITCH_ICON)
+            imageProvider = getSerializable(ImagePicker.EXTRA_IMAGE_PROVIDER) as ImageProvider
+
         }
         return inflater.inflate(R.layout.fragment_image_provider, container, false)
     }
@@ -266,10 +270,15 @@ internal class ImageProviderFragment : Fragment() {
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })*/
         val btnGallery = container.findViewById<ImageView>(R.id.btnGallery)
-        btnGallery?.setImageResource(gallleryIcon)
-        btnGallery?.setOnClickListener {
-            if (mListener != null) {
-                mListener!!.onFragmentInteraction()
+
+        if (imageProvider == ImageProvider.CAMERA) {
+            btnGallery.visibility = View.GONE
+        } else {
+            btnGallery?.setImageResource(gallleryIcon)
+            btnGallery?.setOnClickListener {
+                if (mListener != null) {
+                    mListener!!.onFragmentInteraction()
+                }
             }
         }
 
