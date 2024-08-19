@@ -1,4 +1,3 @@
 include ':ImagePickerLibrary'
 include ':app'
 rootProject.name = "ImagePicker"
-include (':aarfiles')

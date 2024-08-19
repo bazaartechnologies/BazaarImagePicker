@@ -35,18 +35,23 @@ android {
 }
 
 dependencies {
-//    implementation fileTree(dir: "../libs", include: ["*.jar", "*.aar"])
+//    implementation project(':aars')
+    implementation (files('../aars/cameraview-2.7.0.aar'))
+    implementation (files('../aars/inline-activity-result-1.0.4.aar'))
+    implementation (files('../aars/inline-activity-result-kotlin-1.0.4.aar'))
+    implementation (files('../aars/ucrop-2.2.6.aar'))
 
-//    implementation project(':aarfiles')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.5.0'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation files('../libs/cameraview-2.7.0.aar')
-    implementation files('../libs/inline-activity-result-1.0.4.aar')
-    implementation files('../libs/inline-activity-result-kotlin-1.0.4.aar')
-    implementation files('../libs/ucrop-2.2.6.aar')
+
+//    implementation files('../libs/cameraview-2.7.0.aar')
+//    implementation files('../libs/inline-activity-result-1.0.4.aar')
+//    implementation files('../libs/inline-activity-result-kotlin-1.0.4.aar')
+//    implementation files('../libs/ucrop-2.2.6.aar')
+//
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

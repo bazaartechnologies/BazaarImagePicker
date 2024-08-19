@@ -1,5 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('cameraview-2.7.0.aar'))
-artifacts.add("default", file('inline-activity-result-1.0.4.aar'))
-artifacts.add("default", file('inline-activity-result-kotlin-1.0.4.aar'))
-artifacts.add("default", file('ucrop-2.2.6.aar'))

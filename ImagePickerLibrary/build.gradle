@@ -36,15 +36,19 @@ android {
 
 dependencies {
 
-//    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-//    implementation project(':aarfiles')
-    implementation project(":aarfiles", configuration = "default")
+//    implementation project(":aarfiles", configuration = "default")
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
 //    implementation files('libs/cameraview.jar')
 //    implementation files('libs/inline-result.jar')
 //    implementation files('libs/inline-result-kotlin.jar')
 //    implementation files('libs/ucrop.jar')
+
+    compileOnly (files('../aars/cameraview-2.7.0.aar'))
+    compileOnly (files('../aars/inline-activity-result-1.0.4.aar'))
+    compileOnly (files('../aars/inline-activity-result-kotlin-1.0.4.aar'))
+    compileOnly (files('../aars/ucrop-2.2.6.aar'))
+
     // Inline activity result
 //    implementation 'com.github.florent37:inline-activity-result-kotlin:1.0.4'
     // For lifecyclescope
