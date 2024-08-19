@@ -11,12 +11,12 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.example.imagepickerlibrary.R
 import com.example.imagepickerlibrary.image_picker.model.Picker
 import com.example.imagepickerlibrary.image_picker.model.ImageProvider
 import com.example.imagepickerlibrary.image_picker.ui.ImagePickerActivity
 import com.example.imagepickerlibrary.util.FileUtil
+import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

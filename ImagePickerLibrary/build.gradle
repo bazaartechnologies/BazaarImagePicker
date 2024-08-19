@@ -8,7 +8,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -35,12 +35,18 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+//    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+//    implementation project(':aarfiles')
+    implementation project(":aarfiles", configuration = "default")
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
-
+//    implementation files('libs/cameraview.jar')
+//    implementation files('libs/inline-result.jar')
+//    implementation files('libs/inline-result-kotlin.jar')
+//    implementation files('libs/ucrop.jar')
     // Inline activity result
-    implementation 'com.github.florent37:inline-activity-result-kotlin:1.0.4'
+//    implementation 'com.github.florent37:inline-activity-result-kotlin:1.0.4'
     // For lifecyclescope
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0'
 
@@ -58,9 +64,6 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha19"
 
     // Ucrop
-    implementation 'com.github.yalantis:ucrop:2.2.6'
-
-    //Camera 1
-    implementation 'com.otaliastudios:cameraview:2.7.0'
+//    implementation 'com.github.yalantis:ucrop:2.2.6'
 
 }
