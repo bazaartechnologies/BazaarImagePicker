@@ -9,6 +9,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.imagepickerlibrary.R
@@ -16,7 +18,6 @@ import com.example.imagepickerlibrary.image_picker.model.Picker
 import com.example.imagepickerlibrary.image_picker.model.ImageProvider
 import com.example.imagepickerlibrary.image_picker.ui.ImagePickerActivity
 import com.example.imagepickerlibrary.util.FileUtil
-import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -36,13 +37,26 @@ object ImagePicker {
     internal const val EXTRA_GALLERY_ICON = "extra.gallery.icon"
     internal const val EXTRA_CAMERA_SWITCH_ICON = "extra.camera_switch.icon"
 
+
+    private lateinit var fragmentLauncher: ActivityResultLauncher<Intent>
+
+
     @JvmStatic
     fun with(activity: Activity): Builder {
         return Builder(activity)
     }
 
     @JvmStatic
-    fun with(fragment: Fragment): Builder {
+    fun with(fragment: Fragment,completionHandler: ((resultCode: Int, data: Intent?) -> Unit)): Builder {
+
+        fragmentLauncher =
+            fragment.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+                completionHandler.invoke(result.resultCode, result.data)
+
+            }
+
+
         return Builder(fragment)
     }
 
@@ -152,7 +166,7 @@ object ImagePicker {
             return this
         }
 
-        fun bothWithCustom() : Builder{
+        fun bothWithCustom(): Builder {
             this.imageProvider = ImageProvider.BOTH_WITH_CUSTOM
             return this
         }
@@ -325,26 +339,36 @@ object ImagePicker {
 
         }
 
+
         /**
          * Start ImagePickerActivity with given Argument
          */
         private fun startActivity(completionHandler: ((resultCode: Int, data: Intent?) -> Unit)? = null) {
             val intent = Intent(activity, ImagePickerActivity::class.java)
             intent.putExtras(getBundle())
-            if (fragment != null) {
+//            if (fragment != null) {
 
-                fragment?.startForResult(intent) { result ->
-                    completionHandler?.invoke(result.resultCode, result.data)
-                }?.onFailed { result ->
-                    completionHandler?.invoke(result.resultCode, result.data)
-                }
-            } else {
-                (activity as AppCompatActivity).startForResult(intent) { result ->
-                    completionHandler?.invoke(result.resultCode, result.data)
-                }.onFailed { result ->
-                    completionHandler?.invoke(result.resultCode, result.data)
-                }
+
+            fragment?.let {
+
+
+                fragmentLauncher.launch(intent)
+
             }
+
+
+//            fragment?.startForResult(intent) { result ->
+//                completionHandler?.invoke(result.resultCode, result.data)
+//            }?.onFailed { result ->
+//                completionHandler?.invoke(result.resultCode, result.data)
+//            }
+//            } else {
+//                (activity as AppCompatActivity).startForResult(intent) { result ->
+//                    completionHandler?.invoke(result.resultCode, result.data)
+//                }.onFailed { result ->
+//                    completionHandler?.invoke(result.resultCode, result.data)
+//                }
+//            }
         }
 
         /**

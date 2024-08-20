@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 34
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.example.imagepicker"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -35,11 +35,7 @@ android {
 }
 
 dependencies {
-//    implementation project(':aars')
-//    implementation (files('../aars/cameraview-2.7.0.aar'))
-    implementation (files('../aars/inline-activity-result-1.0.4.aar'))
-    implementation (files('../aars/inline-activity-result-kotlin-1.0.4.aar'))
-    implementation (files('../aars/ucrop-2.2.6.aar'))
+
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.5.0'
@@ -47,11 +43,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-//    implementation files('../libs/cameraview-2.7.0.aar')
-//    implementation files('../libs/inline-activity-result-1.0.4.aar')
-//    implementation files('../libs/inline-activity-result-kotlin-1.0.4.aar')
-//    implementation files('../libs/ucrop-2.2.6.aar')
-//
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
