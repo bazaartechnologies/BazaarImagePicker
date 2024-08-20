@@ -128,6 +128,32 @@ object ImagePicker {
             return this
         }
 
+
+        /**
+         * Only Capture image using Camera.
+         */
+        fun cameraOnly(): Builder {
+            this.imageProvider = ImageProvider.CAMERA
+            return this
+        }
+
+
+        fun crop(x: Float, y: Float): Builder {
+            cropX = x
+            cropY = y
+            return crop()
+        }
+
+        fun compressImage(maxWidth: Int = 612, maxHeight: Int = 816): Builder {
+            if (maxHeight > 10 && maxWidth > 10) {
+                this.maxWidth = maxWidth
+                this.maxHeight = maxHeight
+            }
+
+            isToCompress = true
+            return this
+        }
+
         /**
          * Allow dimmed layer to have a circle inside
          */
