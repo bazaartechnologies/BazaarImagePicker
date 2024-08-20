@@ -36,7 +36,7 @@ android {
 
 dependencies {
 //    implementation project(':aars')
-    implementation (files('../aars/cameraview-2.7.0.aar'))
+//    implementation (files('../aars/cameraview-2.7.0.aar'))
     implementation (files('../aars/inline-activity-result-1.0.4.aar'))
     implementation (files('../aars/inline-activity-result-kotlin-1.0.4.aar'))
     implementation (files('../aars/ucrop-2.2.6.aar'))
