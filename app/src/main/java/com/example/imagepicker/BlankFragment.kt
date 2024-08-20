@@ -22,20 +22,14 @@ class BlankFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
 
-
-        imageBuilder = ImagePicker.with(this) { resultCode, data ->
-
+        imageBuilder = ImagePicker.with(this)
+            .setCompletionHandler { resultCode, data ->
             if (resultCode == AppCompatActivity.RESULT_OK && data != null) {
                 val picker = ImagePicker.getPickerData(data)
-
                 view?.findViewById<ImageView>(R.id.iv)?.setImageURI(picker?.uri)
-
             }
-
         }
             .bothWithCustom()
-//                .maxResultSize(200, 200)
-//                .compressImage(20, 20)
             .cropOval()
             .setGalleryIcon(R.drawable.gallery)
             .setCameraSwitchIcon(R.drawable.switch_camera)
@@ -49,11 +43,7 @@ class BlankFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<TextView>(R.id.btnShowCameraOnlyWithCrop)?.setOnClickListener {
-
-            imageBuilder.start { resultCode, data ->
-
-            }
-
+            imageBuilder.start()
         }
     }
 }
