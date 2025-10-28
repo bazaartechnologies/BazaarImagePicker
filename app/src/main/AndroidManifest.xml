@@ -16,7 +16,7 @@
         android:theme="@style/Theme.ImagePicker">
         <activity android:name=".MainActivity"
             android:exported="true">
-            <intent-filter>
+            <intent-filter android:exported="true">
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

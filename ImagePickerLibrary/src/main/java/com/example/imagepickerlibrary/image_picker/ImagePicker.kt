@@ -177,7 +177,7 @@ object ImagePicker {
         private fun showImageProviderDialog() {
             val v = View.inflate(context, R.layout.dialog_image_picker_chooser, null)
 
-            val d = Dialog(context, R.style.Theme_AppCompat_Dialog_Alert)
+            val d = Dialog(context, androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert)
             d.setContentView(v)
 
             v.findViewById<TextView>(R.id.btnCamera).setOnClickListener {
